@@ -9,7 +9,7 @@ export async function GET() {
         MAX(ai_score) as highest_score,
         AVG(ai_score) as average_score,
         COUNT(*) as total_participants
-      FROM aider_un_proche_nomination
+      FROM aider_un_proche_nominations
       WHERE ai_score IS NOT NULL;
     `);
 
@@ -18,11 +18,11 @@ export async function GET() {
       SELECT
         n.id,
         n.ai_score,
-        n.video,
+        n.video_url as video,
         n.participant_id,
         p.first_name,
         p.last_name
-      FROM aider_un_proche_nomination n
+      FROM aider_un_proche_nominations n
       LEFT JOIN contest_participants p ON n.participant_id = p.id
       WHERE n.ai_score IS NOT NULL
       ORDER BY n.ai_score DESC;
@@ -43,10 +43,15 @@ export async function GET() {
       },
       nominations: nominationsResult.rows
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Database error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch data' },
+      {
+        success: false,
+        error: 'Failed to fetch data',
+        details: error.message || String(error),
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

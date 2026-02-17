@@ -1,15 +1,21 @@
-import { Pool } from 'pg';
+import { Pool, PoolConfig } from 'pg';
 
 let pool: Pool | null = null;
 
 export function getPool() {
   if (!pool) {
-    pool = new Pool({
+    const config: PoolConfig = {
       connectionString: process.env.DATABASE_URL,
-      ssl: {
+    };
+
+    // Only add SSL if we're in production and not explicitly disabled
+    if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL?.includes('ssl=true')) {
+      config.ssl = {
         rejectUnauthorized: false,
-      },
-    });
+      };
+    }
+
+    pool = new Pool(config);
   }
   return pool;
 }
