@@ -21,8 +21,8 @@ A Next.js dashboard application for JA Hypothèques with Material-UI and Postgre
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/jahypotheques/dashboard.git
-cd dashboard
+git clone https://github.com/jahypotheques/aider-un-proche-dashboard.git
+cd aider-un-proche-dashboard
 ```
 
 2. Install dependencies:
@@ -76,7 +76,7 @@ DATABASE_URL='postgresql://user:password@host:port/database'
 ## Project Structure
 
 ```
-jahypotheques-dashboard/
+aider-un-proche-dashboard/
 ├── app/
 │   ├── api/
 │   │   └── data/
