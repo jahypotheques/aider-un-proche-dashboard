@@ -6,7 +6,6 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
   Card,
   CardContent,
   CircularProgress,
@@ -19,6 +18,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Stack,
 } from '@mui/material';
 import { Dashboard as DashboardIcon } from '@mui/icons-material';
 
@@ -66,22 +66,20 @@ export default function Home() {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Grid container spacing={3}>
+        <Stack spacing={3}>
           {/* Header */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h4" gutterBottom>
-                Welcome to JA Hypothèques Dashboard
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                This dashboard displays data from your PostgreSQL database
-              </Typography>
-            </Paper>
-          </Grid>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h4" gutterBottom>
+              Welcome to JA Hypothèques Dashboard
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              This dashboard displays data from your PostgreSQL database
+            </Typography>
+          </Paper>
 
           {/* Statistics Cards */}
-          <Grid item xs={12} md={4}>
-            <Card>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
+            <Card sx={{ flex: 1 }}>
               <CardContent>
                 <Typography color="text.secondary" gutterBottom>
                   Total Tables
@@ -91,10 +89,8 @@ export default function Home() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ flex: 1 }}>
               <CardContent>
                 <Typography color="text.secondary" gutterBottom>
                   Database Status
@@ -104,10 +100,8 @@ export default function Home() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ flex: 1 }}>
               <CardContent>
                 <Typography color="text.secondary" gutterBottom>
                   Environment
@@ -117,48 +111,46 @@ export default function Home() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
+          </Stack>
 
           {/* Data Table */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h5" gutterBottom>
-                Database Tables
-              </Typography>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              Database Tables
+            </Typography>
 
-              {loading && (
-                <Box display="flex" justifyContent="center" p={3}>
-                  <CircularProgress />
-                </Box>
-              )}
+            {loading && (
+              <Box display="flex" justifyContent="center" p={3}>
+                <CircularProgress />
+              </Box>
+            )}
 
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {error}
+              </Alert>
+            )}
 
-              {!loading && data?.success && data.tables && (
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell><strong>Table Name</strong></TableCell>
+            {!loading && data?.success && data.tables && (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell><strong>Table Name</strong></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.tables.map((table: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell>{table.table_name}</TableCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {data.tables.map((table: any, index: number) => (
-                        <TableRow key={index}>
-                          <TableCell>{table.table_name}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </Paper>
-          </Grid>
-        </Grid>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Paper>
+        </Stack>
       </Container>
     </>
   );
