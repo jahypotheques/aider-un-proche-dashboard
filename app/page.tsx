@@ -123,17 +123,18 @@ export default function Home() {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        <Stack spacing={3}>
-          {/* Header */}
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-              Nominations Dashboard
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              View and manage contest nominations with AI scoring
-            </Typography>
-          </Paper>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        <Container maxWidth="xl" sx={{ pt: 4, pb: 6 }}>
+          <Stack spacing={4}>
+            {/* Header */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h4" gutterBottom sx={{ color: 'text.primary', fontWeight: 600 }}>
+                Nominations Dashboard
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                View and manage contest nominations with AI scoring
+              </Typography>
+            </Box>
 
           {loading && (
             <Box display="flex" justifyContent="center" p={5}>
@@ -152,33 +153,69 @@ export default function Home() {
               {/* Statistics Cards */}
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
                 <Card sx={{ flex: 1 }}>
-                  <CardContent>
-                    <Typography color="text.secondary" gutterBottom>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2, fontSize: '0.875rem', fontWeight: 500 }}
+                    >
                       Score Maximum
                     </Typography>
-                    <Typography variant="h3" color="primary">
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        fontSize: '2.5rem',
+                        lineHeight: 1.2
+                      }}
+                    >
                       {data.stats?.highestScore.toFixed(2) || 0}
                     </Typography>
                   </CardContent>
                 </Card>
 
                 <Card sx={{ flex: 1 }}>
-                  <CardContent>
-                    <Typography color="text.secondary" gutterBottom>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2, fontSize: '0.875rem', fontWeight: 500 }}
+                    >
                       Score Moyen
                     </Typography>
-                    <Typography variant="h3" color="secondary">
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: 'secondary.main',
+                        fontWeight: 600,
+                        fontSize: '2.5rem',
+                        lineHeight: 1.2
+                      }}
+                    >
                       {data.stats?.averageScore.toFixed(2) || 0}
                     </Typography>
                   </CardContent>
                 </Card>
 
                 <Card sx={{ flex: 1 }}>
-                  <CardContent>
-                    <Typography color="text.secondary" gutterBottom>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2, fontSize: '0.875rem', fontWeight: 500 }}
+                    >
                       Nombre total de participants
                     </Typography>
-                    <Typography variant="h3">
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: 'text.primary',
+                        fontWeight: 600,
+                        fontSize: '2.5rem',
+                        lineHeight: 1.2
+                      }}
+                    >
                       {data.stats?.totalParticipants || 0}
                     </Typography>
                   </CardContent>
@@ -186,12 +223,14 @@ export default function Home() {
               </Stack>
 
               {/* Nominations Table */}
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h5" gutterBottom>
-                  Liste des Nominations
-                </Typography>
+              <Paper sx={{ p: 0, overflow: 'hidden' }}>
+                <Box sx={{ p: 3, pb: 2 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                    Liste des Nominations
+                  </Typography>
+                </Box>
 
-                <TableContainer>
+                <TableContainer sx={{ px: 0 }}>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -211,14 +250,46 @@ export default function Home() {
                     </TableHead>
                     <TableBody>
                       {sortedNominations.map((nomination) => (
-                        <TableRow key={nomination.id} hover>
+                        <TableRow
+                          key={nomination.id}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'rgba(154, 174, 161, 0.05)',
+                            },
+                          }}
+                        >
                           <TableCell>
-                            <Typography variant="h6" color="primary">
-                              {nomination.ai_score.toFixed(2)}
+                            <Box
+                              sx={{
+                                display: 'inline-block',
+                                bgcolor: 'rgba(154, 174, 161, 0.15)',
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 2,
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  color: 'primary.main',
+                                  fontWeight: 600,
+                                  fontSize: '1.1rem'
+                                }}
+                              >
+                                {nomination.ai_score.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                              {nomination.first_name || 'N/A'}
                             </Typography>
                           </TableCell>
-                          <TableCell>{nomination.first_name || 'N/A'}</TableCell>
-                          <TableCell>{nomination.last_name || 'N/A'}</TableCell>
+                          <TableCell>
+                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                              {nomination.last_name || 'N/A'}
+                            </Typography>
+                          </TableCell>
                           <TableCell>
                             {nomination.video ? (
                               <IconButton
@@ -257,8 +328,8 @@ export default function Home() {
         </Stack>
       </Container>
 
-      {/* Video Modal */}
-      <Modal
+        {/* Video Modal */}
+        <Modal
         open={videoModalOpen}
         onClose={handleCloseModal}
         sx={{
@@ -306,6 +377,7 @@ export default function Home() {
           )}
         </Box>
       </Modal>
+      </Box>
     </>
   );
 }
