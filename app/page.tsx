@@ -24,7 +24,8 @@ import {
   TableSortLabel,
   Avatar,
 } from '@mui/material';
-import { Dashboard as DashboardIcon, Close as CloseIcon, PlayCircleOutline as PlayIcon } from '@mui/icons-material';
+import { Close as CloseIcon, PlayCircleOutline as PlayIcon } from '@mui/icons-material';
+import Image from 'next/image';
 
 interface Nomination {
   id: number;
@@ -107,10 +108,16 @@ export default function Home() {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ bgcolor: '#161D19' }}>
         <Toolbar>
-          <DashboardIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Image
+            src="/ja-logo-title-fr.png"
+            alt="JA Hypothèques"
+            width={180}
+            height={50}
+            style={{ marginRight: '16px', objectFit: 'contain' }}
+          />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#F6F7F7' }}>
             Aider un Proche - Dashboard
           </Typography>
         </Toolbar>
