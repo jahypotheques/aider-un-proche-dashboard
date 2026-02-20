@@ -12,18 +12,17 @@ interface NominationRow {
 
 export async function GET() {
   try {
-    // Fetch statistics (highest score, average score, total count) for AI score > 85
+    // Fetch statistics from ALL participants
     const statsResult = await query(`
       SELECT
         MAX(ai_score) as highest_score,
         AVG(ai_score) as average_score,
         COUNT(*) as total_participants
       FROM aider_un_proche_nominations
-      WHERE ai_score IS NOT NULL
-        AND ai_score > 85;
+      WHERE ai_score IS NOT NULL;
     `);
 
-    // Fetch nomination data with participant details (AI score > 85)
+    // Fetch nomination data with participant details (only AI score > 80 for display)
     const nominationsResult = await query(`
       SELECT
         n.id,
@@ -35,7 +34,7 @@ export async function GET() {
       FROM aider_un_proche_nominations n
       LEFT JOIN contest_participants p ON n.participant_id = p.id
       WHERE n.ai_score IS NOT NULL
-        AND n.ai_score > 85
+        AND n.ai_score > 80
       ORDER BY n.ai_score DESC;
     `);
 
