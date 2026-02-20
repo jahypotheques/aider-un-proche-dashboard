@@ -37,6 +37,7 @@ export async function GET() {
     }
 
     // Fetch statistics (highest score, average score, total count) for AI score > 85
+    console.log('Step 1: Attempting to fetch statistics from database...');
     const statsResult = await query(`
       SELECT
         MAX(ai_score) as highest_score,
@@ -46,8 +47,10 @@ export async function GET() {
       WHERE ai_score IS NOT NULL
         AND ai_score > 85;
     `);
+    console.log('Step 1: ✓ Statistics fetched successfully');
 
     // Fetch nomination data with participant details (AI score > 85)
+    console.log('Step 2: Attempting to fetch nominations from database...');
     const nominationsResult = await query(`
       SELECT
         n.id,
@@ -62,6 +65,7 @@ export async function GET() {
         AND n.ai_score > 85
       ORDER BY n.ai_score DESC;
     `);
+    console.log('Step 2: ✓ Nominations fetched successfully, count:', nominationsResult.rows.length);
 
     const stats = statsResult.rows[0] || {
       highest_score: 0,
@@ -70,6 +74,7 @@ export async function GET() {
     };
 
     // Generate presigned URLs using broker-portal's internal endpoint
+    console.log('Step 3: Generating presigned URLs for videos...');
     const brokerPortalUrl = process.env.BROKER_PORTAL_URL;
     const nominations = await Promise.all(
       nominationsResult.rows.map(async (nomination: NominationRow) => {
@@ -87,7 +92,6 @@ export async function GET() {
 
             if (response.ok) {
               const data = await response.json();
-              console.log('Successfully got presigned URL');
               nomination.video = data.url;
             } else {
               const errorText = await response.text();
@@ -100,6 +104,8 @@ export async function GET() {
         return nomination;
       })
     );
+    console.log('Step 3: ✓ Presigned URLs generated');
+    console.log('Step 4: Returning successful response');
 
     return NextResponse.json({
       success: true,
