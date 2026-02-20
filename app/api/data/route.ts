@@ -19,9 +19,12 @@ export async function GET() {
 
     // Log DATABASE_URL with password masked
     const dbUrl = process.env.DATABASE_URL || '';
-    const maskedUrl = dbUrl.replace(/:([^@]+)@/, ':****@');
+    // Better masking that preserves structure
+    const maskedUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@');
     console.log('DATABASE_URL:', maskedUrl);
+    console.log('DATABASE_URL starts with postgresql://', dbUrl.startsWith('postgresql://'));
     console.log('DATABASE_URL includes amazonaws:', dbUrl.includes('amazonaws.com'));
+    console.log('DATABASE_URL includes postgres user:', dbUrl.includes('postgres:'));
     console.log('DATABASE_URL length:', dbUrl.length);
 
     // Check outgoing IP
