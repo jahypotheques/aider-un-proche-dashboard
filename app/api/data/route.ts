@@ -12,6 +12,11 @@ interface NominationRow {
 
 export async function GET() {
   try {
+    console.log('Starting data fetch...');
+    console.log('BROKER_PORTAL_URL:', process.env.BROKER_PORTAL_URL);
+    console.log('DATABASE_URL configured:', !!process.env.DATABASE_URL);
+    console.log('INTERNAL_API_KEY configured:', !!process.env.INTERNAL_API_KEY);
+
     // Fetch statistics (highest score, average score, total count) for AI score > 85
     const statsResult = await query(`
       SELECT
@@ -63,9 +68,11 @@ export async function GET() {
 
             if (response.ok) {
               const data = await response.json();
+              console.log('Successfully got presigned URL');
               nomination.video = data.url;
             } else {
-              console.error(`Failed to get presigned URL for ${nomination.video}:`, await response.text());
+              const errorText = await response.text();
+              console.error(`Failed to get presigned URL for ${nomination.video}:`, response.status, errorText);
             }
           } catch (error) {
             console.error(`Error fetching presigned URL for ${nomination.video}:`, error);
@@ -85,7 +92,11 @@ export async function GET() {
       nominations
     });
   } catch (error: any) {
-    console.error('Database error:', error);
+    console.error('ERROR in /api/data:', error);
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+
     return NextResponse.json(
       {
         success: false,
