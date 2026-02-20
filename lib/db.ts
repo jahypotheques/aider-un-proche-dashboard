@@ -15,9 +15,6 @@ export function getPool() {
     // Set DB_SSL=true in Vercel (and any environment connecting to RDS).
     // Leave it unset locally if your local DB doesn't require SSL.
     const sslEnabled = process.env.DB_SSL === 'true';
-    console.log('Database connection config:');
-    console.log('- SSL enabled:', sslEnabled);
-    console.log('- Connection timeout:', config.connectionTimeoutMillis);
 
     if (sslEnabled) {
       config.ssl = {
