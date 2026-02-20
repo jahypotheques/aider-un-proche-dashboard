@@ -365,6 +365,9 @@ export default function Home() {
             <video
               controls
               autoPlay
+              onError={(e) => console.error('Video error:', e)}
+              onLoadStart={() => console.log('Video loading started')}
+              onCanPlay={() => console.log('Video can play')}
               style={{
                 width: '100%',
                 maxHeight: '80vh',
@@ -372,6 +375,7 @@ export default function Home() {
               }}
             >
               <source src={selectedVideo} type="video/mp4" />
+              <source src={selectedVideo} type="video/quicktime" />
               Your browser does not support the video tag.
             </video>
           )}
