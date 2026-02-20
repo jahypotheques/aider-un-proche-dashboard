@@ -13,9 +13,16 @@ interface NominationRow {
 export async function GET() {
   try {
     console.log('Starting data fetch...');
+    console.log('NODE_ENV:', process.env.NODE_ENV);
     console.log('BROKER_PORTAL_URL:', process.env.BROKER_PORTAL_URL);
-    console.log('DATABASE_URL configured:', !!process.env.DATABASE_URL);
     console.log('INTERNAL_API_KEY configured:', !!process.env.INTERNAL_API_KEY);
+
+    // Log DATABASE_URL with password masked
+    const dbUrl = process.env.DATABASE_URL || '';
+    const maskedUrl = dbUrl.replace(/:([^@]+)@/, ':****@');
+    console.log('DATABASE_URL:', maskedUrl);
+    console.log('DATABASE_URL includes amazonaws:', dbUrl.includes('amazonaws.com'));
+    console.log('DATABASE_URL length:', dbUrl.length);
 
     // Check outgoing IP
     try {
