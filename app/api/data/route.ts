@@ -17,6 +17,15 @@ export async function GET() {
     console.log('DATABASE_URL configured:', !!process.env.DATABASE_URL);
     console.log('INTERNAL_API_KEY configured:', !!process.env.INTERNAL_API_KEY);
 
+    // Check outgoing IP
+    try {
+      const ipCheck = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipCheck.json();
+      console.log('Vercel outgoing IP:', ipData.ip);
+    } catch {
+      console.log('Could not check outgoing IP');
+    }
+
     // Fetch statistics (highest score, average score, total count) for AI score > 85
     const statsResult = await query(`
       SELECT
