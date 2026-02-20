@@ -11,20 +11,18 @@ export function getPool() {
       max: 10, // maximum pool size
     };
 
-    // AWS RDS requires SSL connections
-    // Enable SSL for any RDS connection (detected by amazonaws.com in URL)
-    const isAWSRDS = process.env.DATABASE_URL?.includes('amazonaws.com');
+    // SSL: controlled explicitly via DB_SSL env var rather than URL sniffing.
+    // Set DB_SSL=true in Vercel (and any environment connecting to RDS).
+    // Leave it unset locally if your local DB doesn't require SSL.
+    const sslEnabled = process.env.DB_SSL === 'true';
     console.log('Database connection config:');
-    console.log('- Is AWS RDS:', isAWSRDS);
+    console.log('- SSL enabled:', sslEnabled);
     console.log('- Connection timeout:', config.connectionTimeoutMillis);
 
-    if (isAWSRDS) {
+    if (sslEnabled) {
       config.ssl = {
         rejectUnauthorized: false,
       };
-      console.log('- SSL enabled: true');
-    } else {
-      console.log('- SSL enabled: false');
     }
 
     pool = new Pool(config);
