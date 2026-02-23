@@ -74,8 +74,6 @@ export default function Home() {
   const [sortedNominations, setSortedNominations] = useState<Nomination[]>([]);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<string>('');
-  const [participantModalOpen, setParticipantModalOpen] = useState(false);
-  const [selectedParticipant, setSelectedParticipant] = useState<Nomination | null>(null);
   const [nomineeModalOpen, setNomineeModalOpen] = useState(false);
   const [selectedNominee, setSelectedNominee] = useState<Nomination | null>(null);
   const [textModalOpen, setTextModalOpen] = useState(false);
@@ -147,16 +145,6 @@ export default function Home() {
   const handleCloseModal = () => {
     setVideoModalOpen(false);
     setSelectedVideo('');
-  };
-
-  const handleParticipantClick = (nomination: Nomination) => {
-    setSelectedParticipant(nomination);
-    setParticipantModalOpen(true);
-  };
-
-  const handleCloseParticipantModal = () => {
-    setParticipantModalOpen(false);
-    setSelectedParticipant(null);
   };
 
   const handleNomineeClick = (nomination: Nomination) => {
@@ -338,9 +326,11 @@ export default function Home() {
                             <strong>Score IA</strong>
                           </TableSortLabel>
                         </TableCell>
-                        <TableCell><strong>Soumissionnaire</strong></TableCell>
+                        <TableCell><strong>Nom du soumissionnaire</strong></TableCell>
+                        <TableCell><strong>Cellulaire du soumissionnaire</strong></TableCell>
+                        <TableCell><strong>Courriel du soumissionaire</strong></TableCell>
                         <TableCell><strong>Proche à aider</strong></TableCell>
-                        <TableCell><strong>Text soumis</strong></TableCell>
+                        <TableCell><strong>Texte soumis</strong></TableCell>
                         <TableCell><strong>Vidéo</strong></TableCell>
                       </TableRow>
                     </TableHead>
@@ -377,14 +367,15 @@ export default function Home() {
                             </Box>
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() => handleParticipantClick(nomination)}
-                              sx={{ textTransform: 'none' }}
-                            >
-                              Voir détails
-                            </Button>
+                            <Typography variant="body2">
+                              {nomination.first_name} {nomination.last_name}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">{nomination.phone_number || '—'}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">{nomination.email || '—'}</Typography>
                           </TableCell>
                           <TableCell>
                             <Button
@@ -498,79 +489,6 @@ export default function Home() {
         </Box>
       </Modal>
 
-        {/* Participant Modal */}
-        <Modal
-          open={participantModalOpen}
-          onClose={handleCloseParticipantModal}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Box
-            sx={{
-              position: 'relative',
-              width: '90%',
-              maxWidth: 600,
-              bgcolor: 'background.paper',
-              boxShadow: 24,
-              p: 4,
-              borderRadius: 2,
-            }}
-          >
-            <IconButton
-              sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: 'grey.500',
-              }}
-              onClick={handleCloseParticipantModal}
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-              Soumissionnaire
-            </Typography>
-            {selectedParticipant && (
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Prénom"
-                    secondary={selectedParticipant.first_name || 'N/A'}
-                    primaryTypographyProps={{ fontWeight: 600 }}
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Nom"
-                    secondary={selectedParticipant.last_name || 'N/A'}
-                    primaryTypographyProps={{ fontWeight: 600 }}
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Téléphone"
-                    secondary={selectedParticipant.phone_number || 'N/A'}
-                    primaryTypographyProps={{ fontWeight: 600 }}
-                  />
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemText
-                    primary="Email"
-                    secondary={selectedParticipant.email || 'N/A'}
-                    primaryTypographyProps={{ fontWeight: 600 }}
-                  />
-                </ListItem>
-              </List>
-            )}
-          </Box>
-        </Modal>
-
         {/* Nominee Modal */}
         <Modal
           open={nomineeModalOpen}
@@ -679,7 +597,7 @@ export default function Home() {
               <CloseIcon />
             </IconButton>
             <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-              Text soumis
+              Texte soumis
             </Typography>
             {selectedTexts && (
               <Stack spacing={3}>
