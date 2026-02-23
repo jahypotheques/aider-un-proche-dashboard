@@ -8,6 +8,14 @@ interface NominationRow {
   participant_id: number;
   first_name: string;
   last_name: string;
+  phone_number: string;
+  email: string;
+  nominee_first_name: string;
+  nominee_last_name: string;
+  nominee_phone_number: string;
+  nominee_email: string;
+  why_help_text: string;
+  how_help_text: string;
 }
 
 export async function GET() {
@@ -30,7 +38,15 @@ export async function GET() {
         n.video_url as video,
         n.participant_id,
         p.first_name,
-        p.last_name
+        p.last_name,
+        p.phone_number,
+        p.email,
+        n.nominee_first_name,
+        n.nominee_last_name,
+        n.nominee_phone_number,
+        n.nominee_email,
+        n.why_help_text,
+        n.how_help_text
       FROM aider_un_proche_nominations n
       LEFT JOIN contest_participants p ON n.participant_id = p.id
       WHERE n.ai_score IS NOT NULL
@@ -69,14 +85,14 @@ export async function GET() {
             } else {
               const errorText = await response.text();
               console.error(
-                `Failed to get presigned URL for ${nomination.video}:`,
+                `Échec de récupération de l'URL présignée pour ${nomination.video}:`,
                 response.status,
                 errorText,
               );
             }
           } catch (error) {
             console.error(
-              `Error fetching presigned URL for ${nomination.video}:`,
+              `Erreur lors de la récupération de l'URL présignée pour ${nomination.video}:`,
               error,
             );
           }
@@ -98,7 +114,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch data",
+        error: "Échec du chargement des données",
         details: error.message || String(error),
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       },

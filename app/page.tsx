@@ -23,6 +23,11 @@ import {
   IconButton,
   TableSortLabel,
   Avatar,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import { Close as CloseIcon, PlayCircleOutline as PlayIcon } from '@mui/icons-material';
 import Image from 'next/image';
@@ -34,6 +39,14 @@ interface Nomination {
   participant_id: number;
   first_name: string;
   last_name: string;
+  phone_number: string;
+  email: string;
+  nominee_first_name: string;
+  nominee_last_name: string;
+  nominee_phone_number: string;
+  nominee_email: string;
+  why_help_text: string;
+  how_help_text: string;
 }
 
 interface Stats {
@@ -52,6 +65,7 @@ interface DatabaseData {
 type OrderDirection = 'asc' | 'desc';
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [data, setData] = useState<DatabaseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +73,16 @@ export default function Home() {
   const [sortedNominations, setSortedNominations] = useState<Nomination[]>([]);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<string>('');
+  const [participantModalOpen, setParticipantModalOpen] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<Nomination | null>(null);
+  const [nomineeModalOpen, setNomineeModalOpen] = useState(false);
+  const [selectedNominee, setSelectedNominee] = useState<Nomination | null>(null);
+  const [textModalOpen, setTextModalOpen] = useState(false);
+  const [selectedTexts, setSelectedTexts] = useState<Nomination | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -72,15 +96,17 @@ export default function Home() {
           setSortedNominations(result.nominations);
         }
       } catch (err) {
-        setError('Failed to fetch data');
-        console.error('Error fetching data:', err);
+        setError('Échec du chargement des données');
+        console.error('Erreur lors du chargement des données:', err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchData();
-  }, []);
+    if (mounted) {
+      fetchData();
+    }
+  }, [mounted]);
 
   const handleSort = () => {
     const newDirection = orderDirection === 'desc' ? 'asc' : 'desc';
@@ -106,6 +132,36 @@ export default function Home() {
     setSelectedVideo('');
   };
 
+  const handleParticipantClick = (nomination: Nomination) => {
+    setSelectedParticipant(nomination);
+    setParticipantModalOpen(true);
+  };
+
+  const handleCloseParticipantModal = () => {
+    setParticipantModalOpen(false);
+    setSelectedParticipant(null);
+  };
+
+  const handleNomineeClick = (nomination: Nomination) => {
+    setSelectedNominee(nomination);
+    setNomineeModalOpen(true);
+  };
+
+  const handleCloseNomineeModal = () => {
+    setNomineeModalOpen(false);
+    setSelectedNominee(null);
+  };
+
+  const handleTextClick = (nomination: Nomination) => {
+    setSelectedTexts(nomination);
+    setTextModalOpen(true);
+  };
+
+  const handleCloseTextModal = () => {
+    setTextModalOpen(false);
+    setSelectedTexts(null);
+  };
+
   return (
     <>
       <AppBar position="static" sx={{ bgcolor: '#161D19' }}>
@@ -129,26 +185,32 @@ export default function Home() {
             {/* Header */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="h4" gutterBottom sx={{ color: 'text.primary', fontWeight: 600 }}>
-                Nominations Dashboard
+                Tableau de bord des nominations
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                View and manage contest nominations with AI scoring
+                Voir et gérer les nominations du concours avec notation IA
               </Typography>
             </Box>
 
-          {loading && (
+          {!mounted && (
             <Box display="flex" justifyContent="center" p={5}>
               <CircularProgress size={60} />
             </Box>
           )}
 
-          {error && (
+          {mounted && loading && (
+            <Box display="flex" justifyContent="center" p={5}>
+              <CircularProgress size={60} />
+            </Box>
+          )}
+
+          {mounted && error && (
             <Alert severity="error">
               {error}
             </Alert>
           )}
 
-          {!loading && data?.success && (
+          {mounted && !loading && data?.success && (
             <>
               {/* Statistics Cards */}
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
@@ -243,8 +305,9 @@ export default function Home() {
                             <strong>Score IA</strong>
                           </TableSortLabel>
                         </TableCell>
-                        <TableCell><strong>Prénom</strong></TableCell>
-                        <TableCell><strong>Nom</strong></TableCell>
+                        <TableCell><strong>Soumissionnaire</strong></TableCell>
+                        <TableCell><strong>Proche à aider</strong></TableCell>
+                        <TableCell><strong>Text soumis</strong></TableCell>
                         <TableCell><strong>Vidéo</strong></TableCell>
                       </TableRow>
                     </TableHead>
@@ -281,14 +344,34 @@ export default function Home() {
                             </Box>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                              {nomination.first_name || 'N/A'}
-                            </Typography>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleParticipantClick(nomination)}
+                              sx={{ textTransform: 'none' }}
+                            >
+                              Voir détails
+                            </Button>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                              {nomination.last_name || 'N/A'}
-                            </Typography>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleNomineeClick(nomination)}
+                              sx={{ textTransform: 'none' }}
+                            >
+                              Voir détails
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleTextClick(nomination)}
+                              sx={{ textTransform: 'none' }}
+                            >
+                              Voir texte
+                            </Button>
                           </TableCell>
                           <TableCell>
                             {nomination.video ? (
@@ -365,9 +448,9 @@ export default function Home() {
             <video
               controls
               autoPlay
-              onError={(e) => console.error('Video error:', e)}
-              onLoadStart={() => console.log('Video loading started')}
-              onCanPlay={() => console.log('Video can play')}
+              onError={(e) => console.error('Erreur vidéo:', e)}
+              onLoadStart={() => console.log('Chargement vidéo démarré')}
+              onCanPlay={() => console.log('Vidéo prête à lire')}
               style={{
                 width: '100%',
                 maxHeight: '80vh',
@@ -376,11 +459,221 @@ export default function Home() {
             >
               <source src={selectedVideo} type="video/mp4" />
               <source src={selectedVideo} type="video/quicktime" />
-              Your browser does not support the video tag.
+              Votre navigateur ne supporte pas la balise vidéo.
             </video>
           )}
         </Box>
       </Modal>
+
+        {/* Participant Modal */}
+        <Modal
+          open={participantModalOpen}
+          onClose={handleCloseParticipantModal}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              width: '90%',
+              maxWidth: 600,
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            <IconButton
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: 'grey.500',
+              }}
+              onClick={handleCloseParticipantModal}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+              Soumissionnaire
+            </Typography>
+            {selectedParticipant && (
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary="Prénom"
+                    secondary={selectedParticipant.first_name || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Nom"
+                    secondary={selectedParticipant.last_name || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Téléphone"
+                    secondary={selectedParticipant.phone_number || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Email"
+                    secondary={selectedParticipant.email || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+              </List>
+            )}
+          </Box>
+        </Modal>
+
+        {/* Nominee Modal */}
+        <Modal
+          open={nomineeModalOpen}
+          onClose={handleCloseNomineeModal}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              width: '90%',
+              maxWidth: 600,
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            <IconButton
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: 'grey.500',
+              }}
+              onClick={handleCloseNomineeModal}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+              Proche à aider
+            </Typography>
+            {selectedNominee && (
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary="Prénom"
+                    secondary={selectedNominee.nominee_first_name || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Nom"
+                    secondary={selectedNominee.nominee_last_name || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Téléphone"
+                    secondary={selectedNominee.nominee_phone_number || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText
+                    primary="Email"
+                    secondary={selectedNominee.nominee_email || 'N/A'}
+                    primaryTypographyProps={{ fontWeight: 600 }}
+                  />
+                </ListItem>
+              </List>
+            )}
+          </Box>
+        </Modal>
+
+        {/* Text Modal */}
+        <Modal
+          open={textModalOpen}
+          onClose={handleCloseTextModal}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              width: '90%',
+              maxWidth: 800,
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+              maxHeight: '80vh',
+              overflow: 'auto',
+            }}
+          >
+            <IconButton
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: 'grey.500',
+              }}
+              onClick={handleCloseTextModal}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+              Text soumis
+            </Typography>
+            {selectedTexts && (
+              <Stack spacing={3}>
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                    Pourquoi souhaitez-vous aider ce proche ?
+                  </Typography>
+                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                      {selectedTexts.why_help_text || 'N/A'}
+                    </Typography>
+                  </Paper>
+                </Box>
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                    Comment peut-on aider ce proche ?
+                  </Typography>
+                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                      {selectedTexts.how_help_text || 'N/A'}
+                    </Typography>
+                  </Paper>
+                </Box>
+              </Stack>
+            )}
+          </Box>
+        </Modal>
       </Box>
     </>
   );
