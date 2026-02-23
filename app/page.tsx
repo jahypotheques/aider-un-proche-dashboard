@@ -29,7 +29,8 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { Close as CloseIcon, PlayCircleOutline as PlayIcon } from '@mui/icons-material';
+import { Close as CloseIcon, PlayCircleOutline as PlayIcon, Search as SearchIcon } from '@mui/icons-material';
+import { InputAdornment, TextField } from '@mui/material';
 import Image from 'next/image';
 
 interface Nomination {
@@ -79,6 +80,7 @@ export default function Home() {
   const [selectedNominee, setSelectedNominee] = useState<Nomination | null>(null);
   const [textModalOpen, setTextModalOpen] = useState(false);
   const [selectedTexts, setSelectedTexts] = useState<Nomination | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -107,6 +109,21 @@ export default function Home() {
       fetchData();
     }
   }, [mounted]);
+
+  const filteredNominations = sortedNominations.filter((n) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      n.first_name?.toLowerCase().includes(q) ||
+      n.last_name?.toLowerCase().includes(q) ||
+      n.email?.toLowerCase().includes(q) ||
+      n.phone_number?.toLowerCase().includes(q) ||
+      n.nominee_first_name?.toLowerCase().includes(q) ||
+      n.nominee_last_name?.toLowerCase().includes(q) ||
+      n.nominee_email?.toLowerCase().includes(q) ||
+      n.nominee_phone_number?.toLowerCase().includes(q)
+    );
+  });
 
   const handleSort = () => {
     const newDirection = orderDirection === 'desc' ? 'asc' : 'desc';
@@ -286,10 +303,26 @@ export default function Home() {
 
               {/* Nominations Table */}
               <Paper sx={{ p: 0, overflow: 'hidden' }}>
-                <Box sx={{ p: 3, pb: 2 }}>
+                <Box sx={{ p: 3, pb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Typography variant="h5" sx={{ fontWeight: 600 }}>
                     Liste des Nominations
                   </Typography>
+                  <TextField
+                    size="small"
+                    placeholder="Rechercher..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                    sx={{ width: 280 }}
+                  />
                 </Box>
 
                 <TableContainer sx={{ px: 0 }}>
@@ -312,7 +345,7 @@ export default function Home() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {sortedNominations.map((nomination) => (
+                      {filteredNominations.map((nomination) => (
                         <TableRow
                           key={nomination.id}
                           sx={{
@@ -654,8 +687,8 @@ export default function Home() {
                   <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                     Pourquoi souhaitez-vous aider ce proche ?
                   </Typography>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                  <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
+                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', color: 'text.primary' }}>
                       {selectedTexts.why_help_text || 'N/A'}
                     </Typography>
                   </Paper>
@@ -664,8 +697,8 @@ export default function Home() {
                   <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                     Comment peut-on aider ce proche ?
                   </Typography>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                  <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
+                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', color: 'text.primary' }}>
                       {selectedTexts.how_help_text || 'N/A'}
                     </Typography>
                   </Paper>

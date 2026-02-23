@@ -39,14 +39,14 @@ export async function GET() {
         n.participant_id,
         p.first_name,
         p.last_name,
-        p.phone_number,
+        p.phone as phone_number,
         p.email,
-        n.nominee_first_name,
-        n.nominee_last_name,
-        n.nominee_phone_number,
-        n.nominee_email,
-        n.why_help_text,
-        n.how_help_text
+        n.loved_one_first_name as nominee_first_name,
+        n.loved_one_last_name as nominee_last_name,
+        n.loved_one_phone as nominee_phone_number,
+        n.loved_one_email as nominee_email,
+        n.why as why_help_text,
+        n.how as how_help_text
       FROM aider_un_proche_nominations n
       LEFT JOIN contest_participants p ON n.participant_id = p.id
       WHERE n.ai_score IS NOT NULL
