@@ -124,10 +124,10 @@ export default function Home() {
       }
     }
 
-    if (mounted) {
+    if (mounted && authenticated) {
       fetchData();
     }
-  }, [mounted]);
+  }, [mounted, authenticated]);
 
   const filteredNominations = sortedNominations.filter((n) => {
     if (!searchQuery) return true;
