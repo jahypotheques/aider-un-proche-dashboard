@@ -1,7 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authToken = request.cookies.get('auth_token')?.value;
+
+  if (!authToken || authToken !== process.env.AUTH_PASSWORD) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     // List all tables
     const tablesResult = await query(`

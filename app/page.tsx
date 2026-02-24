@@ -79,6 +79,27 @@ export default function Home() {
   const [textModalOpen, setTextModalOpen] = useState(false);
   const [selectedTexts, setSelectedTexts] = useState<Nomination | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [authenticated, setAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        if (response.ok) {
+          setAuthenticated(true);
+        }
+      } catch {
+        // Not authenticated
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -167,6 +188,93 @@ export default function Home() {
     setSelectedTexts(null);
   };
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password || loginLoading) return;
+
+    setLoginLoading(true);
+    setLoginError('');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
+        setAuthenticated(true);
+        setPassword('');
+      } else {
+        const data = await response.json();
+        setLoginError(data.error || 'Invalid password');
+      }
+    } catch {
+      setLoginError('Connection error');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setAuthenticated(false);
+    setPassword('');
+  };
+
+  if (checkingAuth) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <CircularProgress size={60} />
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+        <Paper sx={{ maxWidth: 400, width: '100%', p: 4 }}>
+          <Box sx={{ mb: 3, textAlign: 'center' }}>
+            <Image
+              src="/ja-logo-title-fr.png"
+              alt="JA Hypothèques"
+              width={160}
+              height={44}
+              style={{ objectFit: 'contain' }}
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Entrez le mot de passe pour continuer
+            </Typography>
+          </Box>
+          <form onSubmit={handleLogin}>
+            <Stack spacing={2}>
+              <TextField
+                type="password"
+                label="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loginLoading}
+                fullWidth
+                autoFocus
+              />
+              {loginError && (
+                <Alert severity="error">{loginError}</Alert>
+              )}
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={loginLoading}
+              >
+                {loginLoading ? 'Connexion...' : 'Se connecter'}
+              </Button>
+            </Stack>
+          </form>
+        </Paper>
+      </div>
+    );
+  }
+
   return (
     <>
       <AppBar position="static" sx={{ bgcolor: '#161D19' }}>
@@ -181,6 +289,9 @@ export default function Home() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#F6F7F7' }}>
             Aider un Proche - Dashboard
           </Typography>
+          <Button onClick={handleLogout} sx={{ color: '#F6F7F7' }}>
+            Déconnexion
+          </Button>
         </Toolbar>
       </AppBar>
 
