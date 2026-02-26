@@ -79,6 +79,7 @@ export default function Home() {
   const [textModalOpen, setTextModalOpen] = useState(false);
   const [selectedTexts, setSelectedTexts] = useState<Nomination | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [displayCount, setDisplayCount] = useState(50);
   const [authenticated, setAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [password, setPassword] = useState('');
@@ -143,6 +144,8 @@ export default function Home() {
       n.nominee_phone_number?.toLowerCase().includes(q)
     );
   });
+
+  const visibleNominations = filteredNominations.slice(0, displayCount);
 
   const handleSort = () => {
     const newDirection = orderDirection === 'desc' ? 'asc' : 'desc';
@@ -410,7 +413,7 @@ export default function Home() {
                     size="small"
                     placeholder="Rechercher..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => { setSearchQuery(e.target.value); setDisplayCount(50); }}
                     slotProps={{
                       input: {
                         startAdornment: (
@@ -446,7 +449,7 @@ export default function Home() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {filteredNominations.map((nomination) => (
+                      {visibleNominations.map((nomination) => (
                         <TableRow
                           key={nomination.id}
                           sx={{
@@ -540,6 +543,16 @@ export default function Home() {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                {displayCount < filteredNominations.length && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setDisplayCount((c) => c + 20)}
+                    >
+                      Afficher plus ({filteredNominations.length - displayCount} restants)
+                    </Button>
+                  </Box>
+                )}
               </Paper>
             </>
           )}
