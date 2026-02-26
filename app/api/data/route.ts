@@ -57,7 +57,6 @@ export async function GET(request: NextRequest) {
       FROM aider_un_proche_nominations n
       LEFT JOIN contest_participants p ON n.participant_id = p.id
       WHERE n.ai_score IS NOT NULL
-        AND n.ai_score > 80
       ORDER BY n.ai_score DESC;
     `);
 
